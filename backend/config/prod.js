@@ -1,7 +1,7 @@
 // module.exports = {
 
 module.exports =  {
-  dbURL:'mongodb+srv://refael:raf123@cluster0.ev2gc.mongodb.net/gig_db?retryWrites=true&w=majority',
+  dbURL:'mongodb+srv://israelielinor:elinor123@cluster0.mk1t2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'  ,
   dbName: 'gig_db'
 }
 

@@ -53,6 +53,7 @@ const logger = require('../../services/logger.service')
 async function getGigById(req, res) {
   try {
     const gigId = req.params.id
+    console.log(gigId)
     const gig = await gigService.getById(gigId)
     res.json(gig)
   } catch (err) {

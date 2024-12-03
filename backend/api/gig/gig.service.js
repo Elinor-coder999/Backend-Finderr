@@ -6,7 +6,7 @@ const ObjectId = require('mongodb').ObjectId
 async function query(filterBy, userId) {
     try {
         // const criteria = _buildCriteria(filterBy)
-        const collection = await dbService.getCollection('gig')
+        const collection = await dbService.getCollection('gig_db')
         // const sort = (sortBy.category === 'recommended') ? { "owner.rate": -1 } : { "price": 1 }
         // var gigs = await collection.find(criteria).sort(sort).toArray()
         var gigs = await collection.find({ "$and": [{ "owner_id": (userId) }] }).toArray()
@@ -44,7 +44,7 @@ function _buildCriteria(filterBy, userId) {
 
 async function getById(gigId) {
     try {
-        const collection = await dbService.getCollection('gig')
+        const collection = await dbService.getCollection('gig_db')
         const gig = collection.findOne({ _id: ObjectId(gigId) })
         return gig
     } catch (err) {
@@ -54,7 +54,7 @@ async function getById(gigId) {
 }
 async function remove(gigId) {
     try {
-        const collection = await dbService.getCollection('gig')
+        const collection = await dbService.getCollection('gig_db')
         await collection.deleteOne({ _id: ObjectId(gigId) })
         return gigId
     } catch (err) {
@@ -68,7 +68,7 @@ async function add(gig) {
         gig.owner.rate = 4
         gig.owner.ratingsCount = 638
         gig.owner.level = 'basic/premium'
-        const collection = await dbService.getCollection('gig')
+        const collection = await dbService.getCollection('gig_db')
         await collection.insertOne(gig)
         return gig
     } catch (err) {
@@ -87,7 +87,7 @@ async function update(gig) {
             imgUrl: gig.imgUrl,
             wishList: gig.wishList,
         }
-        const collection = await dbService.getCollection('gig')
+        const collection = await dbService.getCollection('gig_db')
         await collection.updateOne({ _id: ObjectId(gig._id) }, { $set: gigToSave })
         return gig
     } catch (err) {
@@ -99,7 +99,7 @@ async function update(gig) {
 async function addMsgToChat(msg, gigId) {
     try {
         console.log('gigId', gigId);
-        const collection = await dbService.getCollection('gig')
+        const collection = await dbService.getCollection('gig_db')
         // const toy = await collection.findOne({ "_id": ObjectId(toyId) })
         // toy.chatHistory = toy.chatHistory ? [...toy.chatHistory, msg] : [msg]
         // await collection.replaceOne({ '_id': ObjectId(toyId) }, toy)

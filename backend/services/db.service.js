@@ -30,6 +30,7 @@ async function _connect() {
     if (dbConn) return dbConn
 
     try {
+        console.log(config)
         const client = await MongoClient.connect(config.dbURL)
         return dbConn = client.db(config.dbName)
     } catch (err) {
