@@ -4,7 +4,7 @@ const logger = require('./logger.service')
 
 const dbService = {
     getCollection
-};
+}
 
 module.exports = dbService
 

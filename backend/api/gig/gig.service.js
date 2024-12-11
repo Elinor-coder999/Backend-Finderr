@@ -1,47 +1,74 @@
+const { log } = require('../../middlewares/logger.middleware')
 const dbService = require('../../services/db.service')
 const logger = require('../../services/logger.service')
 const utilService = require('../../services/util.service')
 const ObjectId = require('mongodb').ObjectId
-// let filterBy="draw"
-async function query(filterBy, userId) {
+
+async function query(filterBy) {
     try {
-        // const criteria = _buildCriteria(filterBy)
+        const criteria = _buildCriteria(filterBy)
+        console.log('criteria', criteria)
         const collection = await dbService.getCollection('gig_db')
-        // const sort = (sortBy.category === 'recommended') ? { "owner.rate": -1 } : { "price": 1 }
-        // var gigs = await collection.find(criteria).sort(sort).toArray()
-        var gigs = await collection.find({ "$and": [{ "owner_id": (userId) }] }).toArray()
-        // console.log('gigs from service',gigs);
-        const data = await collection.find().toArray()
-        return data
+        var gigs = await collection.find(criteria).toArray()
+        return gigs
     } catch (err) {
         logger.error('cannot find gigs', err)
         throw err
     }
 }
 
-function _buildCriteria(filterBy, userId) {
-    let criteria = {}
-    if (userId) {
-        criteria = { "owner._id": ObjectId(userId) }
-    } else {
-        if (filterBy.title) {
-            criteria.title = { $regex: filterBy.title, $options: 'i' }
-        }
-        if (filterBy.maxPrice === '') filterBy.maxPrice = 10000
-        if (filterBy.minPrice || filterBy.maxPrice) {
-            criteria = { ...criteria, "$and": [{ "price": { "$gt": +filterBy.minPrice } }, { "price": { "$lte": +filterBy.maxPrice } }] }
-        }
-        if (filterBy.daysToMake) {
-            criteria.daysToMake = { $lte: +filterBy.daysToMake || Infinity }
-        }
+// function _buildCriteria(filterBy, userId) {
+//     let criteria = {}
+//     if (userId) {
+//         criteria = { "owner._id": ObjectId(userId) }
+//     } else {
+//         if (filterBy.title) {
+//             criteria.title = { $regex: filterBy.title, $options: 'i' }
+//         }
+//         if (filterBy.maxPrice === '') filterBy.maxPrice = Infinity
+//         if (filterBy.minPrice && filterBy.maxPrice) {
+//             criteria = { ...criteria, "$and": [{ "price": { "$gte": +filterBy.minPrice } }, { "price": { "$lte": +filterBy.maxPrice } }] }
+//         }
+//         if (filterBy.daysToMake) {
+//             criteria.daysToMake = { $lte: +filterBy.daysToMake || Infinity }
+//         }
 
-        if (filterBy?.tags?.length) {
-            criteria.tags = { $in: filterBy.tags }
+//         if (filterBy.category){
+//             criteria.tags = {$regex: filterBy.title, $options: 'i' }
+//         }
+//     }
+//     return criteria
+// }
+
+function _buildCriteria(filterBy){
+    let criteria = {}
+    console.log('filterBy.category', filterBy.category)
+    if (filterBy.category){
+        criteria.tags = {'$all': [filterBy.category] }
+        console.log(' criteria.tags',  criteria.tags)
+    }
+
+    if (filterBy.minPrice || filterBy.maxPrice) {
+        criteria = { 
+            ...criteria, 
+            "$and": [
+                { price: { $gte: filterBy.minPrice } },
+                { price: { $lte: filterBy.maxPrice } }
+            ]
         }
     }
-    return criteria
-}
 
+    if (filterBy.daysToMake) {
+        criteria.daysToMake = { $lte: +filterBy.daysToMake || Infinity }
+    }
+
+    // if(filterBy.category){
+    //     criteria.search = { $text: { $search:filterBy.search }}
+    // }
+    
+    return criteria
+
+}
 async function getById(gigId) {
     try {
         const collection = await dbService.getCollection('gig_db')

@@ -35,19 +35,22 @@ const logger = require('../../services/logger.service')
 //   }
 // }
 
- async function getGigs(req, res) {
-	try {
-		const filterBy = {
-			minSpeed: +req.query.minSpeed || 0,
-		}
-		const gigs = await gigService.query(filterBy)
-    console.log('gigsssss',gigs);
-    
-		res.json(gigs)
-	} catch (err) {
-		logger.error('Failed to get gigs', err)
-		res.status(400).send({ err: 'Failed to get gigs' })
-	}
+async function getGigs(req, res) {
+  try {
+    console.log('HERE!', req)
+    const filterBy = {
+      category: req.query.category,
+      minPrice: +req.query.minPrice || 0,
+      maxPrice: +req.query.maxPrice || Infinity,
+      daysToMake: +req.query.daysToMake
+    }
+    const gigs = await gigService.query(filterBy)
+
+    res.json(gigs)
+  } catch (err) {
+    logger.error('Failed to get gigs', err)
+    res.status(400).send({ err: 'Failed to get gigs' })
+  }
 }
 
 async function getGigById(req, res) {
