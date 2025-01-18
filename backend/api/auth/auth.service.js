@@ -41,7 +41,7 @@ async function signup({username, password, fullname, imgUrl}) {
 
 
 function getLoginToken(user) {
-    const userInfo = {_id : user._id, fullname: user.fullname, isAdmin: user.isAdmin}
+    const userInfo = {_id : user._id, fullname: user.fullname}
     return cryptr.encrypt(JSON.stringify(userInfo))    
 }
 
@@ -52,7 +52,7 @@ function validateToken(loginToken) {
         return loggedinUser
 
     } catch(err) {
-        console.log('Invalid login token')
+        console.log('Invalid login token', err)
     }
     return null
 }

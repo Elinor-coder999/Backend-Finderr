@@ -3,8 +3,13 @@ const orderService = require('./order.service')
 const socketService = require('../../services/socket.service')
 
 async function getOrders(req, res) {
+    if(!req.loggedinUser){
+        res.status(401).send({ err: 'Not user found' })
+        return
+    }
     try {
-        const orders = await orderService.query()
+        const userId = req.loggedinUser._id
+        const orders = await orderService.query(userId)
         res.send(orders)
     } catch (err) {
         logger.error('Cannot get orders', err)
@@ -13,9 +18,12 @@ async function getOrders(req, res) {
 }
 
 async function addOrder(req, res) {
-    try {
-        // const { loggedinUser } = asyncLocalStorage.getStore()
+    if(!req.loggedinUser){
+        res.status(401).send({ err: 'Not user found' })
+        return
+    }
 
+    try {
         var order = req.body
         order = await orderService.add(order)
         res.send(order)
@@ -27,15 +35,12 @@ async function addOrder(req, res) {
 
 async function updateOrder(req, res) {
     try {
-        // const { loggedinUser } = asyncLocalStorage.getStore()
-
         const order = req.body
         const updatedOrder = await orderService.update(order)
         res.json(updatedOrder)
     } catch (err) {
         logger.error('Failed to update order', err)
         res.status(500).send({ err: 'Failed to update order' })
-
     }
 }
 

@@ -13,10 +13,11 @@ async function add(order) {
     }
 }
 
-async function query() {
+async function query(userId) {
     try {
+        
         const collection = await dbService.getCollection('order')
-        var orders = await collection.find().toArray()
+        var orders = await collection.find({ 'buyer._id': userId }).toArray()
         return orders
 
     } catch (err) {

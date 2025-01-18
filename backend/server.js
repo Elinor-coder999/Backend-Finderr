@@ -2,6 +2,7 @@ const express = require('express')
 const cors = require('cors')
 const path = require('path')
 const cookieParser = require('cookie-parser')
+const { requireAuth } = require('./middlewares/requireAuth.middleware')
 require('dotenv').config()
 
 const app = express()
@@ -11,6 +12,7 @@ const server = require('http').createServer(app)
 app.use(express.static('public'))
 app.use(cookieParser())
 app.use(express.json())
+app.use(requireAuth)
 // app.use(cors(corsOptions))
 
 if (process.env.NODE_ENV === 'production') {

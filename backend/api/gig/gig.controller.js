@@ -2,44 +2,10 @@ const gigService = require('./gig.service.js')
 
 const logger = require('../../services/logger.service')
 
-// async function getGigs(req, res) {
-//   try {
-//       console.log('req.query.params:', req.query.params)
-
-//       const params = typeof req.query.params === 'string' 
-//           ? JSON.parse(req.query.params) 
-//           : req.query.params
-
-//       const { filterBy, userId } = params || {}
-
-//       logger.debug('Getting Gigs');
-//       const gigs = await gigService.query(filterBy,  userId)
-//       res.json(gigs)
-//   } catch (err) {
-//       logger.error('Failed to get gigs', err);
-//       res.status(500).send({ err: 'Failed to get gigs' })
-//   }
-// }
-
-// async function getGigs(req, res) {
-//   const { filterBy } = JSON.parse(req.query.params)
-//   const { sortBy } = JSON.parse(req.query.params)
-//   const { userId } = JSON.parse(req.query.params)
-//   try {
-//     logger.debug('Getting Gigs')
-//     const gigs = await gigService.query(filterBy, sortBy, userId)
-//     res.json(gigs)
-//   } catch (err) {
-//     logger.error('Failed to get gigs', err)
-//     res.status(500).send({ err: 'Failed to get gigs' })
-//   }
-// }
-
 async function getGigs(req, res) {
   try {
-    console.log('HERE!', req)
     const filterBy = {
-      category: req.query.category,
+      categories: req.query.categories,
       minPrice: +req.query.minPrice || 0,
       maxPrice: +req.query.maxPrice || Infinity,
       daysToMake: +req.query.daysToMake
@@ -66,9 +32,17 @@ async function getGigById(req, res) {
 }
 
 async function addGig(req, res) {
-  const { loggedinUser } = req
-  try {
+
+  if (!req.loggedinUser) {
+    res.status(401).send({ err: 'user not found' })
+    return
+  }
+
+  const { _id: userId } = req.loggedinUser
+  
+  try {    
     const gig = req.body
+    gig.owner_id = userId
     const addedGig = await gigService.add(gig)
     res.json(addedGig)
   } catch (err) {

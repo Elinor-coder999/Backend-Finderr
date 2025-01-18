@@ -17,40 +17,19 @@ async function query(filterBy) {
     }
 }
 
-// function _buildCriteria(filterBy, userId) {
-//     let criteria = {}
-//     if (userId) {
-//         criteria = { "owner._id": ObjectId(userId) }
-//     } else {
-//         if (filterBy.title) {
-//             criteria.title = { $regex: filterBy.title, $options: 'i' }
-//         }
-//         if (filterBy.maxPrice === '') filterBy.maxPrice = Infinity
-//         if (filterBy.minPrice && filterBy.maxPrice) {
-//             criteria = { ...criteria, "$and": [{ "price": { "$gte": +filterBy.minPrice } }, { "price": { "$lte": +filterBy.maxPrice } }] }
-//         }
-//         if (filterBy.daysToMake) {
-//             criteria.daysToMake = { $lte: +filterBy.daysToMake || Infinity }
-//         }
-
-//         if (filterBy.category){
-//             criteria.tags = {$regex: filterBy.title, $options: 'i' }
-//         }
-//     }
-//     return criteria
-// }
-
 function _buildCriteria(filterBy){
     let criteria = {}
-    console.log('filterBy.category', filterBy.category)
-    if (filterBy.category){
-        criteria.tags = {'$all': [filterBy.category] }
-        console.log(' criteria.tags',  criteria.tags)
+    console.log(' filterBy.categories',  filterBy.categories)
+    if (filterBy.categories){
+        criteria.tags = { $in: filterBy.categories}
+        
     }
 
-    if (filterBy.minPrice || filterBy.maxPrice) {
+    if (filterBy.minPrice != 0 || filterBy.maxPrice != Infinity) {
+        console.log('filterBy.minPrice', filterBy.minPrice)
+        console.log('filterBy.maxPrice', filterBy.maxPrice)
         criteria = { 
-            ...criteria, 
+            ...criteria,
             "$and": [
                 { price: { $gte: filterBy.minPrice } },
                 { price: { $lte: filterBy.maxPrice } }
@@ -61,14 +40,11 @@ function _buildCriteria(filterBy){
     if (filterBy.daysToMake) {
         criteria.daysToMake = { $lte: +filterBy.daysToMake || Infinity }
     }
-
-    // if(filterBy.category){
-    //     criteria.search = { $text: { $search:filterBy.search }}
-    // }
     
     return criteria
 
 }
+
 async function getById(gigId) {
     try {
         const collection = await dbService.getCollection('gig_db')
@@ -89,20 +65,19 @@ async function remove(gigId) {
         throw err
     }
 }
+
 async function add(gig) {
     try {
-        gig.owner._id = ObjectId(gig.owner._id)
-        gig.owner.rate = 4
-        gig.owner.ratingsCount = 638
-        gig.owner.level = 'basic/premium'
         const collection = await dbService.getCollection('gig_db')
         await collection.insertOne(gig)
+        console.log('gig22', gig)
         return gig
     } catch (err) {
         logger.error('cannot insert gig', err)
         throw err
     }
 }
+
 async function update(gig) {
     try {
         const gigToSave = {
