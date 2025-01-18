@@ -102,10 +102,6 @@ async function addMsgToChat(msg, gigId) {
     try {
         console.log('gigId', gigId);
         const collection = await dbService.getCollection('gig_db')
-        // const toy = await collection.findOne({ "_id": ObjectId(toyId) })
-        // toy.chatHistory = toy.chatHistory ? [...toy.chatHistory, msg] : [msg]
-        // await collection.replaceOne({ '_id': ObjectId(toyId) }, toy)
-        // Can be done with $push!
         await collection.updateOne({ '_id': ObjectId(gigId) }, { $push: { chat: msg } })
     } catch (err) {
         console.log(`ERROR: cannot add message to gig`)

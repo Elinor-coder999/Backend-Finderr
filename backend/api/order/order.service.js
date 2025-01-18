@@ -13,16 +13,21 @@ async function add(order) {
     }
 }
 
-async function query(userId) {
+async function query(role ,userId) {
+    
     try {
-        
         const collection = await dbService.getCollection('order')
-        var orders = await collection.find({ 'buyer._id': userId }).toArray()
+        let filter = {}
+        if (role === 'seller') {
+            filter = { 'seller._id': userId }
+        } else if (role === 'buyer'){
+            filter = { 'buyer._id': userId }
+        }
+        const orders = await collection.find(filter).toArray()
         return orders
-
     } catch (err) {
-        logger.error('cannot find orders', err)
-        throw err
+        logger.error('Cannot find orders', err)
+        throw err;
     }
 }
 
@@ -42,6 +47,7 @@ async function update(order) {
 
 module.exports = {
     query,
+    // queryOrdersBySeller,
     update,
     add
 }

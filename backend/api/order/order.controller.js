@@ -2,23 +2,31 @@ const logger = require('../../services/logger.service')
 const orderService = require('./order.service')
 const socketService = require('../../services/socket.service')
 
+
 async function getOrders(req, res) {
-    if(!req.loggedinUser){
-        res.status(401).send({ err: 'Not user found' })
-        return
+    if (!req.loggedinUser) {
+        return res.status(401).send({ err: 'User not found' })   
     }
+
     try {
         const userId = req.loggedinUser._id
-        const orders = await orderService.query(userId)
-        res.send(orders)
+        const role = req.query.role
+        if (role !=='buyer' && role !== 'seller') {
+           return res.status(400).send({ err: 'Role is not valid' })
+        }
+        const orders = await orderService.query(role,userId)
+        return res.send(orders)
     } catch (err) {
         logger.error('Cannot get orders', err)
-        res.status(500).send({ err: 'Failed to get orders' })
+        return res.status(500).send({ err: 'Failed to get orders' })
     }
 }
 
+
+
+
 async function addOrder(req, res) {
-    if(!req.loggedinUser){
+    if (!req.loggedinUser) {
         res.status(401).send({ err: 'Not user found' })
         return
     }
@@ -46,6 +54,7 @@ async function updateOrder(req, res) {
 
 module.exports = {
     getOrders,
+    // getOrdersForSeller,
     updateOrder,
     addOrder
 }
