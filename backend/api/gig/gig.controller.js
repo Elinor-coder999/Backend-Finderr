@@ -22,7 +22,6 @@ async function getGigs(req, res) {
 async function getGigById(req, res) {
   try {
     const gigId = req.params.id
-    console.log(gigId)
     const gig = await gigService.getById(gigId)
     res.json(gig)
   } catch (err) {
@@ -34,12 +33,10 @@ async function getGigById(req, res) {
 async function addGig(req, res) {
 
   if (!req.loggedinUser) {
-    res.status(401).send({ err: 'user not found' })
+    res.status(401).send({ err: 'User not found' })
     return
   }
-
-  const { _id: userId } = req.loggedinUser
-  
+    const { _id: userId } = req.loggedinUser
   try {    
     const gig = req.body
     gig.owner_id = userId
@@ -52,8 +49,23 @@ async function addGig(req, res) {
 }
 
 async function updateGig(req, res) {
+  if (!req.loggedinUser) {
+    res.status(401).send({ err: 'User not found' })
+    return
+  } 
   try {
     const gig = req.body
+    console.log('gig._id', gig._id)
+    const gigDb = await gigService.getById(gig._id)
+    console.log('req.loggedinUser._id', req.loggedinUser._id)
+    console.log('gigDb.owner_id', gigDb.owner_id)
+    console.log(typeof gigDb.owner_id)
+    console.log(typeof req.loggedinUser._id)
+
+
+    if (req.loggedinUser._id !== gigDb.owner_id.toString()) {
+      return res.status(403).send({ err: 'You are not authorized to update this gig' })
+  }
     const updatedGig = await gigService.update(gig)
     res.json(updatedGig)
   } catch (err) {
@@ -63,8 +75,16 @@ async function updateGig(req, res) {
 }
 
 async function removeGig(req, res) {
+  if (!req.loggedinUser) {
+    res.status(401).send({ err: 'user not found' })
+    return
+  }
   try {
     const gigId = req.params.id
+    const gigDb = gigService.getById(gigId)
+    if (req.loggedinUser._id !== gigDb.owner_id) {
+      return res.status(403).send({ err: 'You are not authorized to update this gig' })
+  }
     const removedId = await gigService.remove(gigId)
     res.send(removedId)
   } catch (err) {

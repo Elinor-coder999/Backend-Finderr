@@ -27,12 +27,13 @@ async function getOrders(req, res) {
 
 async function addOrder(req, res) {
     if (!req.loggedinUser) {
-        res.status(401).send({ err: 'Not user found' })
-        return
+        return res.status(401).send({ err: 'User not found' })
     }
-
     try {
         var order = req.body
+        if (order.buyer._id !== req.loggedinUser._id){
+            return res.status(403).send({ err: 'You are not authorized to add this order' }) 
+        }
         order = await orderService.add(order)
         res.send(order)
     } catch (err) {
@@ -42,8 +43,15 @@ async function addOrder(req, res) {
 }
 
 async function updateOrder(req, res) {
+    if (!req.loggedinUser) {
+        return res.status(401).send({ err: 'User not found' })
+    }
     try {
         const order = req.body
+        const orderDb = orderService.getById(order._id)
+        if (req.loggedinUser._id !== orderDb.seller._id) {
+            return res.status(403).send({ err: 'You are not authorized to update this order' })
+        }
         const updatedOrder = await orderService.update(order)
         res.json(updatedOrder)
     } catch (err) {
@@ -54,7 +62,6 @@ async function updateOrder(req, res) {
 
 module.exports = {
     getOrders,
-    // getOrdersForSeller,
     updateOrder,
     addOrder
 }

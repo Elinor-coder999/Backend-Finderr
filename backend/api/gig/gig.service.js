@@ -51,7 +51,7 @@ async function getById(gigId) {
         const gig = collection.findOne({ _id: ObjectId(gigId) })
         return gig
     } catch (err) {
-        logger.error(`while finding gig ${gigId}`, err)
+        logger.error(`cannot find gig ${gigId}`, err)
         throw err
     }
 }
@@ -108,49 +108,11 @@ async function addMsgToChat(msg, gigId) {
         throw err;
     }
 }
-// async function addMsgToChat(msg, gigId) {
-//     try {
-//         console.log('gigId', gigId);
-//         const collection = await dbService.getCollection('gig')
-//         // const toy = await collection.findOne({ "_id": ObjectId(gigId) })
-//         // toy.chatHistory = toy.chatHistory ? [...toy.chatHistory, msg] : [msg]
-//         // await collection.replaceOne({ '_id': ObjectId(gigId) }, toy)
-//         // Can be done with $push!
-//         await collection.updateOne({ '_id': ObjectId(gigId) }, { $push: { chatHistory: msg } })
-//     } catch (err) {
-//         console.log(`ERROR: cannot add message to gig`)
-//         throw err;
-//     }
-// }
-// async function addGigMsg(gigId, msg) {
-//     try {
-//         msg.id = utilService.makeId()
-//         const collection = await dbService.getCollection('gig')
-//         await collection.updateOne({ _id: ObjectId(gigId) }, { $push: { msgs: msg } })
-//         return msg
-//     } catch (err) {
-//         logger.error(`cannot add gig msg ${gigId}`, err)
-//         throw err
-//     }
-// }
-// async function removeGigMsg(gigId, msgId) {
-//     try {
-//         const collection = await dbService.getCollection('gig')
-//         await collection.updateOne({ _id: ObjectId(gigId) }, { $pull: { msgs: {id: msgId} } })
-//         return msgId
-//     } catch (err) {
-//         logger.error(`cannot add gig msg ${gigId}`, err)
-//         throw err
-//     }
-// }
+
 module.exports = {
     remove,
     query,
     getById,
     add,
     update,
-    addMsgToChat
-    // addMsgToChat
-    // addGigMsg,
-    // removeGigMsg
 }

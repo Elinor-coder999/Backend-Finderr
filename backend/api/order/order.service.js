@@ -8,19 +8,19 @@ async function add(order) {
         await collection.insertOne(order)
         return order
     } catch (err) {
-        logger.error('cannot insert order', err)
+        logger.error('cannot add order', err)
         throw err
     }
 }
 
-async function query(role ,userId) {
-    
+async function query(role, userId) {
+
     try {
         const collection = await dbService.getCollection('order')
         let filter = {}
         if (role === 'seller') {
             filter = { 'seller._id': userId }
-        } else if (role === 'buyer'){
+        } else if (role === 'buyer') {
             filter = { 'buyer._id': userId }
         }
         const orders = await collection.find(filter).toArray()
@@ -40,14 +40,25 @@ async function update(order) {
         await collection.updateOne({ _id: ObjectId(order._id) }, { $set: orderToSave })
         return order
     } catch (err) {
-        logger.error(`cannot update gig ${order._id}`, err)
+        logger.error(`cannot update order ${order._id}`, err)
+        throw err
+    }
+}
+
+async function getById(orderId) {
+    try {
+        const collection = await dbService.getCollection('order')
+        const order = collection.findOne({ _id: ObjectId(orderId) })
+        return order
+    } catch (err) {
+        logger.error(`cannot find order ${orderId}`, err)
         throw err
     }
 }
 
 module.exports = {
     query,
-    // queryOrdersBySeller,
+    getById,
     update,
     add
 }
