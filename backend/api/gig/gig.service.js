@@ -70,7 +70,6 @@ async function add(gig) {
     try {
         const collection = await dbService.getCollection('gig_db')
         await collection.insertOne(gig)
-        console.log('gig22', gig)
         return gig
     } catch (err) {
         logger.error('cannot insert gig', err)
