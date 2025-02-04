@@ -1,13 +1,10 @@
-const { log } = require('../../middlewares/logger.middleware')
 const dbService = require('../../services/db.service')
 const logger = require('../../services/logger.service')
-const utilService = require('../../services/util.service')
 const ObjectId = require('mongodb').ObjectId
 
 async function query(filterBy) {
     try {
         const criteria = _buildCriteria(filterBy)
-        console.log('criteria', criteria)
         const collection = await dbService.getCollection('gig_db')
         var gigs = await collection.find(criteria).toArray()
         return gigs
@@ -17,18 +14,16 @@ async function query(filterBy) {
     }
 }
 
-function _buildCriteria(filterBy){
+function _buildCriteria(filterBy) {
     let criteria = {}
-    console.log(' filterBy.categories',  filterBy.categories)
-    if (filterBy.categories){
-        criteria.tags = { $in: filterBy.categories}
-        
+    if (filterBy.categories) {
+        criteria.tags = { $in: filterBy.categories }
+
     }
 
     if (filterBy.minPrice != 0 || filterBy.maxPrice != Infinity) {
-        console.log('filterBy.minPrice', filterBy.minPrice)
-        console.log('filterBy.maxPrice', filterBy.maxPrice)
-        criteria = { 
+
+        criteria = {
             ...criteria,
             "$and": [
                 { price: { $gte: filterBy.minPrice } },
@@ -40,7 +35,10 @@ function _buildCriteria(filterBy){
     if (filterBy.daysToMake) {
         criteria.daysToMake = { $lte: +filterBy.daysToMake || Infinity }
     }
-    
+    if (filterBy.userId) {
+        criteria.owner_id = filterBy.userId
+    }
+
     return criteria
 
 }

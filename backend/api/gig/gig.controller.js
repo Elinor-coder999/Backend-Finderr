@@ -1,5 +1,4 @@
 const gigService = require('./gig.service.js')
-
 const logger = require('../../services/logger.service')
 
 async function getGigs(req, res) {
@@ -8,10 +7,11 @@ async function getGigs(req, res) {
       categories: req.query.categories,
       minPrice: +req.query.minPrice || 0,
       maxPrice: +req.query.maxPrice || Infinity,
-      daysToMake: +req.query.daysToMake
-    }
+      daysToMake: +req.query.daysToMake,
+      userId: req.query.userId || null
+    }    
     const gigs = await gigService.query(filterBy)
-
+    
     res.json(gigs)
   } catch (err) {
     logger.error('Failed to get gigs', err)
@@ -40,7 +40,6 @@ async function addGig(req, res) {
   try {
     const gig = req.body
     gig.owner_id = userId
-    console.log('gig.owner_id', gig.owner_id);
     
     const addedGig = await gigService.add(gig)
     res.json(addedGig)
