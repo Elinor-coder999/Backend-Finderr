@@ -14,7 +14,6 @@ async function add(order) {
 }
 
 async function query(role, userId) {
-
     try {
         const collection = await dbService.getCollection('order')
         let filter = {}

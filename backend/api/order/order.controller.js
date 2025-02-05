@@ -1,7 +1,5 @@
 const logger = require('../../services/logger.service')
 const orderService = require('./order.service')
-const socketService = require('../../services/socket.service')
-
 
 async function getOrders(req, res) {
     if (!req.loggedinUser) {
@@ -48,7 +46,8 @@ async function updateOrder(req, res) {
     }
     try {
         const order = req.body
-        const orderDb = orderService.getById(order._id)
+        const orderDb = await orderService.getById(order._id)
+     
         if (req.loggedinUser._id !== orderDb.seller._id) {
             return res.status(403).send({ err: 'You are not authorized to update this order' })
         }
